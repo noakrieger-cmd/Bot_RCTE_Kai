@@ -25,7 +25,7 @@ class PrivacyCog(commands.Cog):
             name="📥 Données Collectées",
             value=(
                 "• **Identifiants Discord :** Identifiant unique (`user_id`) et nom d'affichage.\n"
-                "• **Identifiants Valorant :** Pseudo Riot ID et Tag associés via `/register` ou `/player_create`.\n"
+                "• **Identifiants Valorant :** Pseudo Riot ID et Tag associés via `/register`.\n"
                 "• **Statistiques de jeu :** Historique des matchs, scores, ACS, agents joués et rangs.\n"
                 "• **Pronostics :** Historique des votes et scores de paris communautaires."
             ),

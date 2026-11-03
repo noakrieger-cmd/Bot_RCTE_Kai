@@ -12,7 +12,7 @@ class HelpCog(commands.Cog):
             title="🤖 Centre d'Aide - Bot RCTE",
             description=(
                 "**Commandes Équipe Première :** `/presence`, `/compo`, `/rank`, `/stats`, `/planning`, `/results`, `/debrief`\n"
-                "**Stats Joueurs :** `/register`, `/player_create`, `/stats_player`, `/top`\n"
+                "**Stats Joueurs :** `/register`, `/stats_player`, `/top`\n"
                 "**Communauté & Pronos :** `/predict create`, `/predict resolve`\n"
                 "**Matchmaking :** `/5s`, `/trio`, `/duo`\n"
                 "**Actus & VCT :** `/news`, `/vct schedule`"
