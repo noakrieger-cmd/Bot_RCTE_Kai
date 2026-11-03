@@ -1,0 +1,22 @@
+# Données locales et persistance
+data.json
+
+# Fichiers de configuration sensibles (clés d'API / tokens)
+.env
+config.json
+
+# Environnement virtuel Python
+venv/
+.venv/
+env/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Fichiers d'environnement et logs
+*.log
+.DS_Store
+.vscode/
+.idea/
