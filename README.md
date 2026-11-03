@@ -4,37 +4,13 @@
 
 Développé sous **Python (discord.py)** avec une architecture Orientée Objet (POO) strictement modularisée en **Cogs**, Kaï centralise le suivi des statistiques, les compositions d'équipe, les pronostics et l'actualité VCT.
 
----
+🚀 Fonctionnalités Clés :
+⚔️ Gestion Équipe Première : Sondages de présence (/presence), compositions dynamiques avec attribution d'agents (/compo), plannings de matchs (/planning) et formulaires de debriefs d'après-match (/debrief).
 
-## 🛠️ Architecture du Projet
+📊 Performances & Data : Suivi des statistiques d'équipe, calcul du winrate par carte (/stats, /rank), classements des joueurs selon l'ACS moyen (/top) et profils liés aux comptes Riot (/register, /player_create).
 
-Le projet suit une structure modulaire où chaque fonctionnalité est isolée dans son propre fichier dans le dossier `cogs/` :
+🔮 Engagement Communautaire : Système de pronostics interactifs sur les matchs officiels avec attribution automatique de rôles évolutifs (/predict), recherche rapide de joueurs (/5s, /trio, /duo) et alertes live streaming (/stream).
 
-```text
-bot_valorant/
-├── main.py                     # Script principal (Bot loader & Sync Slash Commands)
-├── data.json                   # Base de données locale JSON (exclue de Git)
-├── discloud.config             # Configuration pour le déploiement Discloud
-├── requirements.txt            # Dépendances Python du projet
-├── .env                        # Variables d'environnement / Clés API (exclu de Git)
-├── utils/
-│   ├── storage.py              # Helper de gestion et persistance JSON
-│   └── emojis.py               # Dictionnaire centralisé des emojis du bot
-└── cogs/                       # Modules fonctionnels POO
-    ├── help.py                 # Centre d'aide interactif (/help)
-    ├── matchmaking.py          # Recherche de joueurs (/5s, /trio, /duo)
-    ├── ping.py                 # Test de latence du bot (/ping)
-    ├── player_register.py      # Association des profils Riot / Tracker.gg (/register, /player_create)
-    ├── predictions.py          # Paris communautaires & rôles évolutifs (/predict)
-    ├── premier_compo.py        # Choix de la composition & API Agents Valorant (/compo)
-    ├── premier_debrief.py      # Débriefs d'après-match (/debrief)
-    ├── premier_match_tracker.py# Suivi des résultats & rappels auto de matchs (/results)
-    ├── premier_planning.py     # Calendrier des matchs de la saison (/planning)
-    ├── premier_player_stats.py # MVP & classement individuel aux ACS (/stats_player, /top)
-    ├── premier_presence.py     # Sondages de disponibilité (/presence)
-    ├── premier_team_stats.py   # Tableau de bord d'équipe, winrates & rangs (/stats, /rank)
-    ├── privacy.py              # Politique RGPD & Droit à l'oubli (/privacy, /forgetme)
-    ├── terms.py                # Conditions Générales d'Utilisation (/terms)
-    ├── streaming.py            # Rôles automatiques & annonces de live (/setstreamchannel)
-    ├── valorant_news.py        # Patch notes et actualités officielles (/news)
-    └── vct_tracker.py          # Planning de la scène professionnelle VCT (/vct schedule)
+📰 Veille Esports & Actus : Suivi de la scène professionnelle VCT (/vct schedule) et des actualités officielles du jeu (/news).
+
+🔒 Sécurité & Conformité : Protection des données personnelles conformément au RGPD (/privacy, /forgetme) et conditions d'utilisation transparentes (/terms).
