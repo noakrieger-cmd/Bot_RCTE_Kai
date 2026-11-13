@@ -2,23 +2,24 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from utils.storage import edit_data, load_data
-
-KNOWN_AGENTS = ["Astra", "Breach", "Brimstone", "Chamber", "Clove", "Cypher", "Deadlock", "Fade", "Gekko", "Harbor", "Iso", "Jett", "KAY/O", "Killjoy", "Neon", "Omen", "Phoenix", "Raze", "Reyna", "Sage", "Skye", "Sova", "Tejo", "Viper", "Vyse", "Waylay", "Yoru"]
+from utils.valorant import AGENTS, match_agent
 
 class PremierPlayerStatsCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     async def agent_autocomplete(self, interaction: discord.Interaction, current: str):
-        return [app_commands.Choice(name=name, value=name) for name in KNOWN_AGENTS if current.casefold() in name.casefold()][:25]
+        return [app_commands.Choice(name=name, value=name) for name in AGENTS if current.casefold() in name.casefold()][:25]
 
     @app_commands.command(name="stats_player", description="Saisir les stats d'un joueur pour un match")
     @app_commands.checks.has_role("Admin RCTE")
     @app_commands.autocomplete(agent=agent_autocomplete)
     async def stats_player(self, interaction: discord.Interaction, joueur: discord.Member, acs: app_commands.Range[int, 0, 1000], kills: app_commands.Range[int, 0, 100], deaths: app_commands.Range[int, 0, 100], assists: app_commands.Range[int, 0, 100], agent: str):
-        if agent not in KNOWN_AGENTS:
+        canonical_agent = match_agent(agent)
+        if canonical_agent is None:
             await interaction.response.send_message("Choisissez un agent de la liste proposée.", ephemeral=True)
             return
+        agent = canonical_agent
         async with edit_data() as data:
             p_stats = data.setdefault("premier", {}).setdefault("player_stats", {})
             p = p_stats.setdefault(str(joueur.id), {"name": joueur.display_name, "matches": 0, "total_acs": 0, "total_kills": 0, "total_deaths": 0, "total_assists": 0, "agents": {}})

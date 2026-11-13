@@ -1,9 +1,11 @@
 # Bot RCTE
 
+Bot Discord centré sur l’**organisation des matchs Première** (planning, rappels, présences, composition, résultats, debriefs) et la **recherche de coéquipiers** (`/5s`, `/trio`, `/duo`). Il n’appelle aucune API externe : seules les données saisies sur le serveur sont utilisées.
+
 ## Installation
 
 1. Installez Python 3.11 ou plus récent et [uv](https://docs.astral.sh/uv/).
-2. Copiez `.env` vers `.env`, puis renseignez `DISCORD_TOKEN`, `HENRIKDEV_API_KEY` et, pour synchroniser les commandes rapidement pendant le développement, `DISCORD_GUILD_ID`.
+2. Copiez `.env.example` vers `.env`, puis renseignez `DISCORD_TOKEN` et, pour synchroniser les commandes rapidement pendant le développement, `DISCORD_GUILD_ID`.
 3. Installez les dépendances avec `uv sync` puis lancez le bot avec `uv run python main.py`.
 4. Créez le rôle Discord `Admin RCTE` et attribuez-le aux responsables autorisés à modifier les résultats, statistiques, présence, composition, planning, pronostics et configuration.
 5. Activez les intents privilégiés **Server Members Intent** et **Presence Intent** dans le Developer Portal. Le Presence Intent sert aux annonces de stream et à l’attribution du rôle `En Stream`.
@@ -13,4 +15,4 @@ Les commandes `/nextmatch` et `/setmatchchannel` configurent les rappels. `/plan
 
 Les données runtime sont écrites dans `data.json` à côté de `main.py`. Le fichier est ignoré par Git; `data.example.json` documente sa structure sans inclure de données de test.
 
-Les profils Riot et les rangs utilisent l’API communautaire HenrikDev et requièrent une clé API. La commande `/register` enregistre le profil seulement après une réponse exploitable de l’API. Les données et classements de l’équipe restent saisis manuellement.
+La commande `/register` associe un Riot ID à un compte Discord sans aucune vérification auprès d’un service externe (le format est simplement contrôlé). Les données et classements de l’équipe sont saisis manuellement. La liste des agents est statique : quand Riot ajoute un agent, ajoutez-le dans `utils/valorant.py`.

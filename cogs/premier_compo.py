@@ -1,9 +1,8 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-import logging
-import aiohttp
 from utils.storage import edit_data, load_data
+from utils.valorant import AGENTS
 
 class AgentSelect(discord.ui.Select):
     def __init__(self, target_player: discord.Member, agents_list: list, picker: "AgentPickerView"):
@@ -58,21 +57,10 @@ class PremierCompoCog(commands.Cog):
 
     compo_group = app_commands.Group(name="compo", description="Gestion de la composition officielle")
 
-    async def _fetch_agents(self) -> list:
-        try:
-            async with self.bot.session.get("https://valorant-api.com/v1/agents?isPlayableCharacter=true") as resp:
-                if resp.status == 200:
-                    agents = [a["displayName"] for a in (await resp.json()).get("data", [])]
-                    return sorted(agents)
-        except Exception:
-            logging.getLogger(__name__).exception("Échec du chargement des agents Valorant")
-        return sorted(["Jett", "Raze", "Reyna", "Sova", "Fade", "Omen", "Viper", "Cypher", "Killjoy", "Brimstone", "Breach", "KAY/O", "Skye", "Yoru", "Astra", "Chamber", "Neon", "Harbor", "Gekko", "Deadlock", "Iso", "Clove", "Vyse", "Tejo"])
-
     @compo_group.command(name="update", description="Modifier l'agent d'un joueur dans la composition")
     @app_commands.checks.has_role("Admin RCTE")
     async def update(self, interaction: discord.Interaction, joueur: discord.Member):
-        agents = await self._fetch_agents()
-        view = AgentPickerView(joueur, agents)
+        view = AgentPickerView(joueur, list(AGENTS))
         await interaction.response.send_message(f"Choisis l'agent pour {joueur.mention} :", view=view, ephemeral=True)
 
     @compo_group.command(name="show", description="Afficher la composition de l’équipe")

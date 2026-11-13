@@ -1,6 +1,6 @@
 # Politique de confidentialité — Bot RCTE (brouillon)
 
-**Version de travail — ne pas publier avant d’avoir vérifié les champs encore signalés et les traitements réellement activés.** Date d’entrée en vigueur : **6 novembre 2026**. Ce texte décrit la version cible du bot; les liaisons Riot par OAuth, les statistiques automatiques et les flux sociaux restent à développer.
+**Version de travail — ne pas publier avant d’avoir vérifié les champs encore signalés et les traitements réellement activés.** Date d’entrée en vigueur : **6 novembre 2026**. Ce texte décrit la version cible du bot; le bot n’appelle aucune API tierce de statistiques, d’actualités ou de calendrier, et une liaison Riot officielle (OAuth/RSO) n’est pas implémentée.
 
 ## 1. Responsable et contact
 
@@ -15,14 +15,13 @@ Le bot est destiné aux membres du serveur Discord RCTE âgés d’au moins **15
 Selon les fonctionnalités activées, le bot peut traiter :
 
 - identifiant Discord, nom d’affichage et appartenance au serveur;
-- identifiant Riot/VALORANT et données de compte ou de jeu associées;
-- résultats et statistiques de matchs, notamment K/D, tirs à la tête, ACS, rang et historique de matchs;
+- identifiant Riot/VALORANT saisi volontairement (aucune donnée de compte ou de jeu n’est récupérée automatiquement);
+- résultats et statistiques de matchs saisis manuellement par les responsables (ACS, éliminations, morts, assists, agent, rang et classement de l’équipe, historique de matchs);
 - données de gestion de l’équipe RCTE : effectif, composition, présence, résultats, classement, pronostics et statistiques saisies par les responsables;
 - contenu des debriefs saisis par les membres autorisés, dont le nom de l’auteur et les commentaires d’équipe;
-- informations publiques de publications VALORANT officielles, telles que leur titre, leur lien, leur plateforme et leur date de publication;
 - données techniques nécessaires au fonctionnement et au diagnostic du bot, notamment les journaux d’erreurs.
 
-La saisie ou liaison des données de jeu est volontaire. Les statistiques individuelles sont visibles par **les membres du serveur RCTE**. La version actuelle du bot enregistre un Riot ID saisi via une commande; une authentification Riot officielle et un import automatique des statistiques ne sont pas encore implémentés.
+La saisie ou liaison des données de jeu est volontaire. Les statistiques individuelles sont visibles par **les membres du serveur RCTE**. La version actuelle du bot enregistre un Riot ID saisi via une commande, sans vérification auprès d’un service tiers; une authentification Riot officielle et un import automatique des statistiques ne sont pas implémentés.
 
 ## 4. Finalités et bases juridiques
 
@@ -30,24 +29,23 @@ La saisie ou liaison des données de jeu est volontaire. Les statistiques indivi
 |---|---|
 | Enregistrer volontairement un Riot ID et afficher les données associées | Consentement de la personne (à confirmer selon la mise en œuvre finale) |
 | Gérer l’effectif, la composition, les présences, les matchs et les statistiques d’équipe | Base juridique à confirmer avant mise en service de la version cible |
-| Fournir des liens vers les actualités et contenus officiels | Base juridique à confirmer; flux sociaux non encore activés |
 | Diagnostiquer les erreurs, protéger le bot et prévenir les abus | Base juridique et données de journal à confirmer selon la configuration déployée |
 
 Les données ne sont pas réutilisées à d’autres fins sans information préalable et, lorsque nécessaire, sans nouvelle base juridique.
 
 ## 5. Sources et destinataires
 
-Les données proviennent de Discord, des joueurs qui saisissent volontairement leur Riot ID, des responsables RCTE qui saisissent les données d’équipe et de fournisseurs tiers sollicités par le bot.
+Les données proviennent de Discord, des joueurs qui saisissent volontairement leur Riot ID et des responsables RCTE qui saisissent les données d’équipe.
 
-Les destinataires peuvent inclure le responsable du traitement et les membres du serveur pour les données affichées par les commandes. Le code actuel sollicite Discord, l’API communautaire HenrikDev (profils Valorant et actualités), l’API communautaire VLR.gg (calendrier VCT) et Valorant-API (catalogue d’agents). Ces fournisseurs peuvent recevoir les paramètres nécessaires à chaque requête, notamment le Riot ID pour la recherche de profil. Les futures API officielles Riot/RSO et les flux YouTube, TikTok, Instagram ou X ne sont pas encore intégrés.
+Les destinataires peuvent inclure le responsable du traitement et les membres du serveur pour les données affichées par les commandes. Le code actuel ne sollicite que Discord : aucune API tierce (statistiques, actualités, calendrier, catalogue d’agents) n’est appelée et le Riot ID saisi n’est transmis à aucun service externe. Les API officielles Riot/RSO et les flux sociaux ne sont pas intégrés.
 
 Le bot ne demande ni n’enregistre le mot de passe Riot. La version actuelle ne stocke pas de jeton OAuth Riot. Si une future intégration RSO nécessite de tels jetons, la présente politique devra être mise à jour avant sa mise en service pour préciser leur stockage, leur protection et leur suppression.
 
 ## 6. Hébergement et transferts
 
-Pour le moment, le bot et sa base sont hébergés localement, sur la machine qui exécute le bot; aucun hébergeur de base de données externe n’a été déclaré. Les fournisseurs d’API cités ci-dessus reçoivent cependant les requêtes nécessaires à leurs services. Le lieu de leurs traitements, les sauvegardes locales, les personnes ayant accès à la machine et la région d’hébergement de production restent à documenter avant publication.
+Pour le moment, le bot et sa base sont hébergés localement, sur la machine qui exécute le bot; aucun hébergeur de base de données externe n’a été déclaré. Discord reste le seul service externe sollicité par le bot. Les sauvegardes locales, les personnes ayant accès à la machine et la région d’hébergement de production restent à documenter avant publication.
 
-**À compléter avant publication :** emplacement et délai d’effacement des sauvegardes, personnes habilitées, région de production si elle change, et pays de traitement des fournisseurs externes.
+**À compléter avant publication :** emplacement et délai d’effacement des sauvegardes, personnes habilitées et région de production si elle change.
 
 ## 7. Durées de conservation
 
@@ -76,6 +74,6 @@ La version en vigueur sera publiée à l’endroit où les membres consultent ce
 1. Emplacement et délai d’effacement des sauvegardes; la machine locale est actuellement accessible à Krieger Noa seulement.
 2. Base juridique des données d’équipe et des journaux; mécanisme concret de retrait de la liaison Riot.
 3. Publier la politique au même endroit que celui où les membres la consultent; notifier les membres seulement si une modification substantielle l’exige.
-4. Mettre à jour cette politique avant d’activer OAuth/RSO ou les flux sociaux, et confirmer les conditions des fournisseurs API.
+4. Mettre à jour cette politique avant d’activer OAuth/RSO, des flux sociaux ou toute API tierce.
 
 Références : [CNIL — durées de conservation](https://www.cnil.fr/fr/passer-laction/les-durees-de-conservation-des-donnees) · [CNIL — information et droits](https://www.cnil.fr/fr/passer-laction/rgpd-les-premieres-etapes) · [Discord — âge minimum](https://support.discord.com/hc/fr/articles/360040724612-Pourquoi-Discord-me-demande-ma-date-de-naissance).

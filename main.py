@@ -5,7 +5,6 @@ import logging
 import os
 from pathlib import Path
 
-import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -21,8 +20,6 @@ logger = logging.getLogger(__name__)
 
 
 class ValorantBot(commands.Bot):
-    session: aiohttp.ClientSession
-
     def __init__(self) -> None:
         intents = discord.Intents.default()
         intents.members = True
@@ -30,7 +27,6 @@ class ValorantBot(commands.Bot):
         super().__init__(command_prefix="!", intents=intents, tree_cls=RcteCommandTree)
 
     async def setup_hook(self) -> None:
-        self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=12))
         cogs_dir = BASE_DIR / "cogs"
         for path in sorted(cogs_dir.glob("*.py")):
             if not path.name.startswith("_"):
@@ -51,11 +47,6 @@ class ValorantBot(commands.Bot):
             logger.info("Commandes globales synchronisées")
         else:
             logger.info("Synchronisation globale différée ; utilisez /sync en tant que propriétaire du bot")
-
-    async def close(self) -> None:
-        if hasattr(self, "session"):
-            await self.session.close()
-        await super().close()
 
     async def on_ready(self) -> None:
         logger.info("Connecté en tant que %s (%s)", self.user, self.user.id if self.user else "?")

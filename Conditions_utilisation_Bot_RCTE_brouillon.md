@@ -1,10 +1,10 @@
 # Conditions d’utilisation — Bot RCTE (brouillon)
 
-**Version de travail — ne pas publier avant validation du responsable, des règles du serveur et des champs indiqués ci-dessous.** Date d’entrée en vigueur : **6 novembre 2026**. Les statistiques automatiques Riot et les flux sociaux décrits comme futurs ne sont pas encore implémentés.
+**Version de travail — ne pas publier avant validation du responsable, des règles du serveur et des champs indiqués ci-dessous.** Date d’entrée en vigueur : **6 novembre 2026**. Le bot n’importe aucune statistique automatique depuis Riot ou une autre API : les données de jeu sont saisies manuellement.
 
 ## 1. Objet du service
 
-Le Bot RCTE fournit aux membres du [serveur Discord RCTE](https://discord.gg/2vKc5TGYc) des fonctions de suivi de l’équipe, de présence et de résultats, des pronostics communautaires, des statistiques VALORANT et des liens vers des actualités ou publications publiques.
+Le Bot RCTE fournit aux membres du [serveur Discord RCTE](https://discord.gg/2vKc5TGYc) des fonctions d’organisation de l’équipe (matchs Première, planning, présence, composition, résultats), de recherche de coéquipiers, des pronostics communautaires et des statistiques d’équipe saisies manuellement par les responsables.
 
 Le service est fourni à titre communautaire. Les statistiques et informations externes peuvent être retardées, indisponibles ou inexactes. Les rangs et résultats affichés par le bot ne remplacent pas les données officielles du jeu ou des plateformes concernées.
 
