@@ -3,7 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 
 class PingCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @app_commands.command(name="ping", description="Vérifie la latence du bot")
@@ -11,5 +11,5 @@ class PingCog(commands.Cog):
         latency = round(self.bot.latency * 1000)
         await interaction.response.send_message(f"🏓 Pong ! Latence : `{latency} ms`", ephemeral=True)
 
-async def setup(bot):
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(PingCog(bot))

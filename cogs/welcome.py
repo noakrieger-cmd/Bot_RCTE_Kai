@@ -1,15 +1,15 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from utils.storage import load_data, save_data
+from utils.storage import edit_data, load_data
 
 class WelcomeCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        data = load_data()
+        data = await load_data()
         channel_id = data.get("settings", {}).get("welcome_channel")
         if not channel_id:
             return
@@ -28,10 +28,9 @@ class WelcomeCog(commands.Cog):
     @app_commands.describe(salon="Le salon textuel pour souhaiter la bienvenue")
     @app_commands.default_permissions(administrator=True)
     async def set_welcome_channel(self, interaction: discord.Interaction, salon: discord.TextChannel):
-        data = load_data()
-        data.setdefault("settings", {})["welcome_channel"] = salon.id
-        save_data(data)
+        async with edit_data() as data:
+            data.setdefault("settings", {})["welcome_channel"] = salon.id
         await interaction.response.send_message(f"✅ Salon d'accueil configuré sur {salon.mention} !", ephemeral=True)
 
-async def setup(bot):
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(WelcomeCog(bot))

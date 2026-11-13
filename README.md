@@ -1,16 +1,16 @@
-# 🎯 Kaï — Bot Discord Compétitif Valorant
+# Bot RCTE
 
-**Kaï** est un bot Discord complet conçu sur mesure pour la gestion opérationnelle et l'animation communautaire d'une équipe compétitive Valorant (*Équipe Première*). 
+## Installation
 
-Développé sous **Python (discord.py)** avec une architecture Orientée Objet (POO) strictement modularisée en **Cogs**, Kaï centralise le suivi des statistiques, les compositions d'équipe, les pronostics et l'actualité VCT.
+1. Installez Python 3.11 ou plus récent et [uv](https://docs.astral.sh/uv/).
+2. Copiez `.env` vers `.env`, puis renseignez `DISCORD_TOKEN`, `HENRIKDEV_API_KEY` et, pour synchroniser les commandes rapidement pendant le développement, `DISCORD_GUILD_ID`.
+3. Installez les dépendances avec `uv sync` puis lancez le bot avec `uv run python main.py`.
+4. Créez le rôle Discord `Admin RCTE` et attribuez-le aux responsables autorisés à modifier les résultats, statistiques, présence, composition, planning, pronostics et configuration.
+5. Activez les intents privilégiés **Server Members Intent** et **Presence Intent** dans le Developer Portal. Le Presence Intent sert aux annonces de stream et à l’attribution du rôle `En Stream`.
+6. Dans le serveur, placez le rôle du bot au-dessus de `En Stream` et des rôles de pronostics. Le bot a besoin de `Manage Roles`, ainsi que des permissions d’envoi et de lecture dans les salons configurés.
 
-🚀 Fonctionnalités Clés :
-⚔️ Gestion Équipe Première : Sondages de présence (/presence), compositions dynamiques avec attribution d'agents (/compo), plannings de matchs (/planning) et formulaires de debriefs d'après-match (/debrief).
+Les commandes `/nextmatch` et `/setmatchchannel` configurent les rappels. `/planning_add` ajoute un match, `/planning_clear` vide le planning, et `/rank_set` met à jour le rang et le classement. Les dates du prochain match sont saisies en heure de Paris au format `AAAA-MM-JJ HH:MM`. En production, la synchronisation globale est manuelle via `/sync` (propriétaire du bot); pour une première synchronisation sans commandes globales déjà en place, démarrez une fois avec `SYNC_GLOBAL_COMMANDS=true`, puis remettez la variable à `false`.
 
-📊 Performances & Data : Suivi des statistiques d'équipe, calcul du winrate par carte (/stats, /rank), classements des joueurs selon l'ACS moyen (/top) et profils liés aux comptes Riot (/register, /player_create).
+Les données runtime sont écrites dans `data.json` à côté de `main.py`. Le fichier est ignoré par Git; `data.example.json` documente sa structure sans inclure de données de test.
 
-🔮 Engagement Communautaire : Système de pronostics interactifs sur les matchs officiels avec attribution automatique de rôles évolutifs (/predict), recherche rapide de joueurs (/5s, /trio, /duo) et alertes live streaming (/stream).
-
-📰 Veille Esports & Actus : Suivi de la scène professionnelle VCT (/vct schedule) et des actualités officielles du jeu (/news).
-
-🔒 Sécurité & Conformité : Protection des données personnelles conformément au RGPD (/privacy, /forgetme) et conditions d'utilisation transparentes (/terms).
+Les profils Riot et les rangs utilisent l’API communautaire HenrikDev et requièrent une clé API. La commande `/register` enregistre le profil seulement après une réponse exploitable de l’API. Les données et classements de l’équipe restent saisis manuellement.

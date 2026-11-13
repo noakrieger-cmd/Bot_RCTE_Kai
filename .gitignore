@@ -10,6 +10,9 @@ venv/
 .venv/
 env/
 
+# Notes personnelles sur les fonctionnalités futures
+Fonctionnalités.md
+
 # Cache Python
 __pycache__/
 *.py[cod]
