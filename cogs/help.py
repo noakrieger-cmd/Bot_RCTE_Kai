@@ -9,7 +9,7 @@ class HelpCog(commands.Cog):
 
     @staticmethod
     def _flatten_commands(commands_list):
-        """Déplie les groupes pour afficher les commandes slash complètes."""
+        """Déplie les groupes pour afficher les chemins slash complets."""
         flattened = []
         for command in commands_list:
             if isinstance(command, app_commands.Group):
@@ -20,22 +20,20 @@ class HelpCog(commands.Cog):
 
     @app_commands.command(name="help", description="Affiche le centre d'aide du bot")
     async def help_command(self, interaction: discord.Interaction):
-        # Les commandes sont synchronisées sur une guilde précise dans main.py.
         guild = discord.Object(id=interaction.guild_id) if interaction.guild_id else None
-        registered = self.bot.tree.get_commands(guild=guild)
 
-        # Inclure aussi les commandes globales encore présentes, sans doublons.
-        if guild is not None:
-            registered += self.bot.tree.get_commands()
+        # On lit l'arbre local réellement chargé, pas une liste codée en dur.
+        registered = self.bot.tree.get_commands(guild=guild) if guild else []
+        registered += self.bot.tree.get_commands()
 
-        commands_list = self._flatten_commands(registered)
+        # Dédupliquer et exclure les anciennes commandes retirées du projet.
+        excluded = {"help", "register", "player_create", "stats_player", "top"}
         unique_commands = {}
-        for command in commands_list:
-            qualified_name = command.qualified_name
-            # /register est l'ancien nom : seul /player create doit être affiché.
-            if qualified_name.casefold() in {"help", "register", "player"}:
+        for command in self._flatten_commands(registered):
+            name = command.qualified_name.casefold().replace("_", " ")
+            if name in excluded:
                 continue
-            unique_commands[qualified_name] = command
+            unique_commands[command.qualified_name] = command
 
         commands_list = sorted(
             unique_commands.values(),
@@ -47,20 +45,11 @@ class HelpCog(commands.Cog):
             description="Commandes disponibles sur ce serveur :",
             color=discord.Color.red(),
         )
-
-        if not commands_list:
-            embed.description = (
-                "Aucune commande n'a été trouvée. Vérifiez le chargement des Cogs "
-                "et synchronisez les commandes avec `/sync`."
-            )
-        else:
+        if commands_list:
             lines = [
-                f"`/{command.qualified_name}` — {command.description or 'Aucune description'}"
+                f"• `/{command.qualified_name}` — {command.description or 'Aucune description'}"
                 for command in commands_list
             ]
-            # Ajouter explicitement le profil joueur sous son nom attendu.
-            if any(command.qualified_name == "player create" for command in commands_list):
-                pass
             description = "\n".join(lines)
             if len(description) <= 4000:
                 embed.description = description
@@ -79,6 +68,8 @@ class HelpCog(commands.Cog):
                         chunk = candidate
                 if chunk:
                     embed.add_field(name=f"Commandes ({field_number})", value=chunk, inline=False)
+        else:
+            embed.description = "Aucune commande disponible. Vérifiez le chargement des Cogs."
 
         embed.set_footer(text=f"{len(commands_list)} commande(s) disponible(s)")
         await interaction.response.send_message(embed=embed, ephemeral=True)

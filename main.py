@@ -29,15 +29,25 @@ class ValorantBot(commands.Bot):
     async def setup_hook(self) -> None:
         cogs_dir = BASE_DIR / "cogs"
         for path in sorted(cogs_dir.glob("*.py")):
-            if not path.name.startswith("_"):
+            if not path.name.startswith("_") and path.stem != "premier_player_stats":
                 await self.load_extension(f"cogs.{path.stem}")
                 logger.info("Cog chargé : %s", path.stem)
         if GUILD_ID:
             guild = discord.Object(id=int(GUILD_ID))
+            # Remplacer entièrement les commandes de guilde : sync() seul
+            # ne supprime pas les anciennes commandes encore enregistrées chez Discord.
+            self.tree.clear_commands(guild=guild)
             self.tree.copy_global_to(guild=guild)
-            await self.tree.sync(guild=guild)
+            synced_guild = await self.tree.sync(guild=guild)
+
+            # Les commandes sont volontairement publiées uniquement sur cette guilde.
             self.tree.clear_commands(guild=None)
             await self.tree.sync()
+            logger.info(
+                "%s commandes synchronisées pour la guilde %s ; commandes globales supprimées",
+                len(synced_guild),
+                GUILD_ID,
+            )
             logger.info(
                 "Commandes synchronisées pour la guilde %s ; commandes globales supprimées",
                 GUILD_ID,
