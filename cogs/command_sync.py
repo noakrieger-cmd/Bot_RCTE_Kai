@@ -24,7 +24,14 @@ class CommandSyncCog(commands.Cog):
         guild_id = os.getenv("DISCORD_GUILD_ID", "").strip()
         if guild_id:
             guild = discord.Object(id=int(guild_id))
+            # Publier uniquement les commandes issues des Cogs actuellement chargés.
+            self.bot.tree.clear_commands(guild=guild)
+            self.bot.tree.copy_global_to(guild=guild)
             synced = await self.bot.tree.sync(guild=guild)
+
+            # Le projet utilise les commandes de guilde : supprimer les anciennes globales.
+            self.bot.tree.clear_commands(guild=None)
+            await self.bot.tree.sync()
             scope = f"le serveur {guild_id}"
         else:
             synced = await self.bot.tree.sync()

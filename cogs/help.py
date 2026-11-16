@@ -26,14 +26,27 @@ class HelpCog(commands.Cog):
         registered = self.bot.tree.get_commands(guild=guild) if guild else []
         registered += self.bot.tree.get_commands()
 
-        # Dédupliquer et exclure les anciennes commandes retirées du projet.
-        excluded = {"help", "register", "player_create", "stats_player", "top"}
+        # Exclure les anciennes commandes, y compris leurs anciens noms
+        # avec underscore. On compare à la fois le chemin complet et le nom brut.
+        excluded = {
+            "help",
+            "register",
+            "player_create",
+            "stats_player",
+            "top",
+        }
         unique_commands = {}
         for command in self._flatten_commands(registered):
-            name = command.qualified_name.casefold().replace("_", " ")
-            if name in excluded:
+            qualified_name = command.qualified_name.casefold().strip()
+            command_name = command.name.casefold().strip()
+            normalized_name = qualified_name.replace("_", " ")
+            if (
+                qualified_name in excluded
+                or command_name in excluded
+                or normalized_name in {"player create", "stats player"}
+            ):
                 continue
-            unique_commands[command.qualified_name] = command
+            unique_commands[qualified_name] = command
 
         commands_list = sorted(
             unique_commands.values(),
