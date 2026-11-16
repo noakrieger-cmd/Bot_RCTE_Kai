@@ -20,11 +20,6 @@ class PlayerRegisterCog(commands.Cog):
     async def register(self, interaction: discord.Interaction, pseudo: str, tag: str):
         await self._save_player(interaction, interaction.user, pseudo, tag)
 
-    @app_commands.command(name="player_create", description="(Admin/Coach) Associer un joueur Discord à un compte Riot")
-    @app_commands.checks.has_role("Admin RCTE")
-    async def player_create(self, interaction: discord.Interaction, membre: discord.Member, pseudo: str, tag: str):
-        await self._save_player(interaction, membre, pseudo, tag)
-
     async def _save_player(self, interaction: discord.Interaction, member: discord.abc.User, pseudo: str, tag: str):
         clean_name, clean_tag = pseudo.strip(), tag.replace("#", "").strip()
         min_len, max_len = RIOT_NAME_LENGTH

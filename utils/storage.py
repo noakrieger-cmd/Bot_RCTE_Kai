@@ -20,10 +20,9 @@ def default_data() -> dict[str, Any]:
         "accounts": {},
         "premier": {
             "rank": "Non défini", "standing": "Non classé",
-            "next_match": {"date": None, "map": None, "opponent": None, "reminded_stages": []},
             "current_presence": {"presents": [], "absents": [], "substitutes": []},
             "current_compo": {"players": {}}, "history": [], "planning": [],
-            "player_stats": {}, "debriefs": [],
+            "debriefs": [],
         },
         "predictions": {"active": None, "scores": {}},
     }

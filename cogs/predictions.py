@@ -47,20 +47,34 @@ class PredictionsCog(commands.Cog):
     async def cog_load(self) -> None:
         self.bot.add_view(PredictionView())
 
-    predict_group = app_commands.Group(name="predict", description="Gestion des pronostics")
-
-    @predict_group.command(name="create", description="Lancer un pari sur un match")
+    @app_commands.command(name="predict", description="Lancer un pronostic sur un match")
     @app_commands.checks.has_role("Admin RCTE")
-    async def create(self, interaction: discord.Interaction, match_name: str):
+    async def predict(self, interaction: discord.Interaction, match_name: str):
         async with edit_data() as data:
             predictions = data.setdefault("predictions", {})
             active = predictions.get("active")
             if active and active.get("is_open"):
-                await interaction.response.send_message("Un pronostic est déjà ouvert. Clôturez-le avant d’en créer un autre.", ephemeral=True)
+                await interaction.response.send_message(
+                    "Un pronostic est déjà ouvert. Clôturez-le avant d’en créer un autre.",
+                    ephemeral=True,
+                )
                 return
-            predictions["active"] = {"match_name": match_name, "is_open": True, "votes": {}, "channel_id": interaction.channel_id}
-        embed = discord.Embed(title="🔮 PRONOSTICS OUVERTS !", description=f"Match : **{match_name}**", color=discord.Color.gold())
-        embed.add_field(name="🏆 Rôles à débloquer", value="5: `@Petit Visionnaire` | 10: `@Médium` | 20: `@Voyant` | 50+: `@Prédicteur Fou`", inline=False)
+            predictions["active"] = {
+                "match_name": match_name,
+                "is_open": True,
+                "votes": {},
+                "channel_id": interaction.channel_id,
+            }
+        embed = discord.Embed(
+            title="🔮 PRONOSTICS OUVERTS !",
+            description=f"Match : **{match_name}**",
+            color=discord.Color.gold(),
+        )
+        embed.add_field(
+            name="🏆 Rôles à débloquer",
+            value="5: `@Petit Visionnaire` | 10: `@Médium` | 20: `@Voyant` | 50+: `@Prédicteur Fou`",
+            inline=False,
+        )
         await interaction.response.send_message(embed=embed, view=PredictionView())
         message = await interaction.original_response()
         async with edit_data() as data:
@@ -68,10 +82,13 @@ class PredictionsCog(commands.Cog):
             if active and active.get("channel_id") == interaction.channel_id:
                 active["message_id"] = message.id
 
-    @predict_group.command(name="resolve", description="Clôturer le pari et attribuer les points/rôles")
-    @app_commands.choices(issue=[app_commands.Choice(name="Victoire", value="Victoire"), app_commands.Choice(name="Défaite", value="Défaite")])
+    @app_commands.command(name="predict_resolve", description="Clôturer le pronostic et attribuer les points")
+    @app_commands.choices(issue=[
+        app_commands.Choice(name="Victoire", value="Victoire"),
+        app_commands.Choice(name="Défaite", value="Défaite"),
+    ])
     @app_commands.checks.has_role("Admin RCTE")
-    async def resolve(self, interaction: discord.Interaction, issue: app_commands.Choice[str]):
+    async def predict_resolve(self, interaction: discord.Interaction, issue: app_commands.Choice[str]):
         await interaction.response.defer()
         async with edit_data() as data:
             active = data.get("predictions", {}).get("active")
@@ -89,14 +106,21 @@ class PredictionsCog(commands.Cog):
                     if member:
                         await self._update_roles(interaction.guild, member, scores[user_id])
             data["predictions"]["active"] = None
-        embed = discord.Embed(title="🎉 Résultats des Pronostics !", description=f"Issue : **{issue.value}**", color=discord.Color.green())
+        embed = discord.Embed(
+            title="🎉 Résultats des Pronostics !",
+            description=f"Issue : **{issue.value}**",
+            color=discord.Color.green(),
+        )
         embed.add_field(name="⭐ Gagnants (+1 pt)", value="\n".join(winners) if winners else "Aucun gagnant.", inline=False)
         await interaction.followup.send(embed=embed)
 
     async def _update_roles(self, guild: discord.Guild, member: discord.Member, score: int) -> None:
         winner = next(((name, color) for points, name, color in PREDICTION_ROLES if score >= points), None)
         tier_names = {name for _, name, _ in PREDICTION_ROLES}
-        obsolete = [role for role in member.roles if role.name in tier_names and (winner is None or role.name != winner[0])]
+        obsolete = [
+            role for role in member.roles
+            if role.name in tier_names and (winner is None or role.name != winner[0])
+        ]
         try:
             if obsolete:
                 await member.remove_roles(*obsolete, reason="Mise à jour du palier de pronostics")

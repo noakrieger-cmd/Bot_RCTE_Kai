@@ -65,7 +65,7 @@ class RcteCommandTree(app_commands.CommandTree):
             return
 
         if isinstance(error, app_commands.MissingRole):
-            message = "Cette commande est réservée aux membres ayant le rôle Admin RCTE."
+            message = "Vous ne possédez pas le rôle requis pour utiliser cette commande."
         elif isinstance(error, app_commands.MissingPermissions):
             message = "Vous n’avez pas les permissions nécessaires pour cette commande."
         else:

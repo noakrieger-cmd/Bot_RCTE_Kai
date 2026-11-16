@@ -8,12 +8,6 @@
   "premier": {
     "rank": "Non défini",
     "standing": "Non classé",
-    "next_match": {
-      "date": null,
-      "map": null,
-      "opponent": null,
-      "reminded_stages": []
-    },
     "current_presence": {
       "presents": [],
       "absents": [],
@@ -22,7 +16,6 @@
     "current_compo": {"players": {}},
     "history": [],
     "planning": [],
-    "player_stats": {},
     "debriefs": []
   },
   "predictions": {
