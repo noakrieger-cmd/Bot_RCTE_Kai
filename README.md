@@ -15,4 +15,4 @@ La commande `/planning_add` ajoute un match (date et carte, sans adversaire) et 
 
 Les données runtime sont écrites dans `data.json` à côté de `main.py`. Le fichier est ignoré par Git; `data.example.json` documente sa structure sans inclure de données de test.
 
-La commande `/register` associe un Riot ID à un compte Discord sans aucune vérification auprès d’un service externe (le format est simplement contrôlé). Les résultats et classements de l’équipe sont saisis manuellement. Les statistiques individuelles ACS/HS% ne sont pas proposées tant qu’aucune source fiable n’est intégrée. La liste des agents est statique : quand Riot ajoute un agent, ajoutez-le dans `utils/valorant.py`.
+La commande `` associe un Riot ID à un compte Discord sans aucune vérification auprès d’un service externe (le format est simplement contrôlé). Les résultats et classements de l’équipe sont saisis manuellement. Les statistiques individuelles ACS/HS% ne sont pas proposées tant qu’aucune source fiable n’est intégrée. La liste des agents est statique : quand Riot ajoute un agent, ajoutez-le dans `utils/valorant.py`.

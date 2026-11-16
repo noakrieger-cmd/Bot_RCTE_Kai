@@ -15,7 +15,7 @@
 ## Pronostics et joueurs
 - `/predict_create` crée le sondage de pronostic (Admin RCTE). `/predict` permet aux joueurs de voter pour le match annoncé tant que le sondage est ouvert.
 - `/predict_resolve` clôture le pronostic avec les seules options `Victoire` et `Défaite`.
-- `/player_create` est supprimée ; `/register` reste la commande d'enregistrement Riot ID.
+- `/player_create` est supprimée.
 - `/stats_player` et `/top` sont supprimées : aucune statistique individuelle ACS/HS% n'est affichée sans source de données fiable.
 
 ## Sécurité du paquet
