@@ -24,6 +24,19 @@ class CommandSyncCog(commands.Cog):
         guild_id = os.getenv("DISCORD_GUILD_ID", "").strip()
         if guild_id:
             guild = discord.Object(id=int(guild_id))
+            # Purger d'abord les anciennes commandes publiées (globales et serveur).
+            legacy = {"register", "player_create", "stats_player", "top"}
+            for command in await self.bot.tree.fetch_commands(guild=guild):
+                if command.name.casefold() in legacy:
+                    await self.bot.http.delete_guild_command(
+                        self.bot.application_id, guild.id, command.id
+                    )
+            for command in await self.bot.tree.fetch_commands():
+                if command.name.casefold() in legacy:
+                    await self.bot.http.delete_global_command(
+                        self.bot.application_id, command.id
+                    )
+
             # Publier uniquement les commandes issues des Cogs actuellement chargés.
             self.bot.tree.clear_commands(guild=guild)
             self.bot.tree.copy_global_to(guild=guild)

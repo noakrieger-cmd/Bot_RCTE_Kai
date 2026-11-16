@@ -34,6 +34,9 @@ class ValorantBot(commands.Bot):
                 logger.info("Cog chargé : %s", path.stem)
         if GUILD_ID:
             guild = discord.Object(id=int(GUILD_ID))
+            # Purger les anciennes commandes distantes avant de publier l'arbre actuel.
+            await self._remove_legacy_remote_commands(guild=guild)
+            await self._remove_legacy_remote_commands(guild=None)
             # Remplacer entièrement les commandes de guilde : sync() seul
             # ne supprime pas les anciennes commandes encore enregistrées chez Discord.
             self.tree.clear_commands(guild=guild)
@@ -66,7 +69,7 @@ class ValorantBot(commands.Bot):
 
     async def _remove_legacy_remote_commands(self, guild=None) -> None:
         """Supprime les anciennes commandes publiées chez Discord."""
-        legacy_names = {"register", "player_create", "stats_player", "top"}
+        legacy_names = {"register", "player_create", "stats_player", "top"}  # anciennes commandes à retirer
         remote_commands = await self.tree.fetch_commands(guild=guild)
         for command in remote_commands:
             if command.name.casefold() in legacy_names:
