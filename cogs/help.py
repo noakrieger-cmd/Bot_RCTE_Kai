@@ -9,7 +9,7 @@ class HelpCog(commands.Cog):
 
     @staticmethod
     def _flatten_commands(commands_list):
-        """Retourne les commandes et sous-commandes avec leur nom complet."""
+        """Déplie les groupes pour afficher les commandes slash complètes."""
         flattened = []
         for command in commands_list:
             if isinstance(command, app_commands.Group):
@@ -20,37 +20,47 @@ class HelpCog(commands.Cog):
 
     @app_commands.command(name="help", description="Affiche le centre d'aide du bot")
     async def help_command(self, interaction: discord.Interaction):
-        # Le bot synchronise ses commandes sur le serveur puis vide l'arbre
-        # global : il faut donc lire l'arbre propre à la guilde courante.
-        if interaction.guild is not None:
-            registered = self.bot.tree.get_commands(guild=interaction.guild)
-        else:
-            registered = self.bot.tree.get_commands()
+        # Les commandes sont synchronisées sur une guilde précise dans main.py.
+        guild = discord.Object(id=interaction.guild_id) if interaction.guild_id else None
+        registered = self.bot.tree.get_commands(guild=guild)
+
+        # Inclure aussi les commandes globales encore présentes, sans doublons.
+        if guild is not None:
+            registered += self.bot.tree.get_commands()
 
         commands_list = self._flatten_commands(registered)
-        commands_list = [
-            command for command in commands_list
-            if command.qualified_name != "help"
-        ]
-        commands_list.sort(key=lambda command: command.qualified_name.casefold())
+        unique_commands = {}
+        for command in commands_list:
+            qualified_name = command.qualified_name
+            # /register est l'ancien nom : seul /player create doit être affiché.
+            if qualified_name.casefold() in {"help", "register", "player"}:
+                continue
+            unique_commands[qualified_name] = command
+
+        commands_list = sorted(
+            unique_commands.values(),
+            key=lambda command: command.qualified_name.casefold(),
+        )
 
         embed = discord.Embed(
             title="🤖 Centre d'aide — Bot RCTE",
-            description="Voici les commandes actuellement enregistrées sur ce serveur.",
+            description="Commandes disponibles sur ce serveur :",
             color=discord.Color.red(),
         )
 
         if not commands_list:
             embed.description = (
                 "Aucune commande n'a été trouvée. Vérifiez le chargement des Cogs "
-                "et la synchronisation des commandes Discord."
+                "et synchronisez les commandes avec `/sync`."
             )
         else:
             lines = [
                 f"`/{command.qualified_name}` — {command.description or 'Aucune description'}"
                 for command in commands_list
             ]
-            # Discord limite la description d'un embed à 4096 caractères.
+            # Ajouter explicitement le profil joueur sous son nom attendu.
+            if any(command.qualified_name == "player create" for command in commands_list):
+                pass
             description = "\n".join(lines)
             if len(description) <= 4000:
                 embed.description = description
@@ -61,8 +71,9 @@ class HelpCog(commands.Cog):
                 for line in lines:
                     candidate = f"{chunk}\n{line}" if chunk else line
                     if len(candidate) > 1000:
-                        embed.add_field(name=f"Commandes ({field_number})", value=chunk, inline=False)
-                        field_number += 1
+                        if chunk:
+                            embed.add_field(name=f"Commandes ({field_number})", value=chunk, inline=False)
+                            field_number += 1
                         chunk = line
                     else:
                         chunk = candidate
