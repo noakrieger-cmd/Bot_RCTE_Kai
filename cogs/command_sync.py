@@ -29,9 +29,24 @@ class CommandSyncCog(commands.Cog):
             self.bot.tree.copy_global_to(guild=guild)
             synced = await self.bot.tree.sync(guild=guild)
 
+            # Supprimer les anciennes commandes de guilde encore publiées chez Discord.
+            remote_guild_commands = await self.bot.tree.fetch_commands(guild=guild)
+            legacy = {"register", "player_create", "stats_player", "top"}
+            for command in remote_guild_commands:
+                if command.name.casefold() in legacy:
+                    await self.bot.http.delete_guild_command(
+                        self.bot.application_id, guild.id, command.id
+                    )
+
             # Le projet utilise les commandes de guilde : supprimer les anciennes globales.
             self.bot.tree.clear_commands(guild=None)
             await self.bot.tree.sync()
+            remote_global_commands = await self.bot.tree.fetch_commands()
+            for command in remote_global_commands:
+                if command.name.casefold() in legacy:
+                    await self.bot.http.delete_global_command(
+                        self.bot.application_id, command.id
+                    )
             scope = f"le serveur {guild_id}"
         else:
             synced = await self.bot.tree.sync()

@@ -40,9 +40,15 @@ class ValorantBot(commands.Bot):
             self.tree.copy_global_to(guild=guild)
             synced_guild = await self.tree.sync(guild=guild)
 
+            # Supprimer explicitement les anciennes commandes distantes de guilde.
+            await self._remove_legacy_remote_commands(guild=guild)
+
             # Les commandes sont volontairement publiées uniquement sur cette guilde.
             self.tree.clear_commands(guild=None)
             await self.tree.sync()
+            # Purger également les anciennes commandes globales (elles peuvent rester
+            # visibles dans Discord si elles avaient été publiées avant le passage en guilde).
+            await self._remove_legacy_remote_commands(guild=None)
             logger.info(
                 "%s commandes synchronisées pour la guilde %s ; commandes globales supprimées",
                 len(synced_guild),
@@ -57,6 +63,18 @@ class ValorantBot(commands.Bot):
             logger.info("Commandes globales synchronisées")
         else:
             logger.info("Synchronisation globale différée ; utilisez /sync en tant que propriétaire du bot")
+
+    async def _remove_legacy_remote_commands(self, guild=None) -> None:
+        """Supprime les anciennes commandes publiées chez Discord."""
+        legacy_names = {"register", "player_create", "stats_player", "top"}
+        remote_commands = await self.tree.fetch_commands(guild=guild)
+        for command in remote_commands:
+            if command.name.casefold() in legacy_names:
+                if guild is None:
+                    await self.http.delete_global_command(self.application_id, command.id)
+                else:
+                    await self.http.delete_guild_command(self.application_id, guild.id, command.id)
+                logger.info("Ancienne commande Discord supprimée : /%s", command.name)
 
     async def on_ready(self) -> None:
         logger.info("Connecté en tant que %s (%s)", self.user, self.user.id if self.user else "?")
