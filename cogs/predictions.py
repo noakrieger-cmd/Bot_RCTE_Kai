@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from utils.storage import edit_data
+from utils.storage import edit_data, load_data
 
 logger = logging.getLogger(__name__)
 PREDICTION_ROLES = [
@@ -32,8 +32,6 @@ class PredictionView(discord.ui.View):
             active = data.get("predictions", {}).get("active")
             if not active or not active.get("is_open"):
                 message = "❌ Les votes sont fermés !"
-            elif active.get("message_id") and interaction.message.id != active["message_id"]:
-                message = "❌ Ce sondage n’est plus actif."
             else:
                 active.setdefault("votes", {})[str(interaction.user.id)] = choice
                 message = f"✅ Vote pris en compte : **{choice}**"
@@ -47,9 +45,9 @@ class PredictionsCog(commands.Cog):
     async def cog_load(self) -> None:
         self.bot.add_view(PredictionView())
 
-    @app_commands.command(name="predict", description="Lancer un pronostic sur un match")
+    @app_commands.command(name="predict_create", description="Créer le sondage de pronostic d'un match")
     @app_commands.checks.has_role("Admin RCTE")
-    async def predict(self, interaction: discord.Interaction, match_name: str):
+    async def predict_create(self, interaction: discord.Interaction, match_name: str):
         async with edit_data() as data:
             predictions = data.setdefault("predictions", {})
             active = predictions.get("active")
@@ -81,6 +79,24 @@ class PredictionsCog(commands.Cog):
             active = data.get("predictions", {}).get("active")
             if active and active.get("channel_id") == interaction.channel_id:
                 active["message_id"] = message.id
+
+    @app_commands.command(name="predict", description="Prédire le résultat du prochain match")
+    async def predict(self, interaction: discord.Interaction):
+        data = await load_data()
+        active = data.get("predictions", {}).get("active")
+        if not active or not active.get("is_open"):
+            await interaction.response.send_message(
+                "❌ Aucun pronostic n'est actuellement ouvert. Attendez que l'administration crée le sondage du prochain match.",
+                ephemeral=True,
+            )
+            return
+
+        embed = discord.Embed(
+            title="🔮 Pronostic du prochain match",
+            description=f"Match : **{active.get('match_name', 'Match à définir')}**\n\nChoisissez votre prédiction :",
+            color=discord.Color.gold(),
+        )
+        await interaction.response.send_message(embed=embed, view=PredictionView(), ephemeral=True)
 
     @app_commands.command(name="predict_resolve", description="Clôturer le pronostic et attribuer les points")
     @app_commands.choices(issue=[
