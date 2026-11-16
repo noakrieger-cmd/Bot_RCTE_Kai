@@ -69,7 +69,7 @@ class ValorantBot(commands.Bot):
 
     async def _remove_legacy_remote_commands(self, guild=None) -> None:
         """Supprime les anciennes commandes publiées chez Discord."""
-        legacy_names = {"register", "player_create", "stats_player", "top"}  # anciennes commandes à retirer
+        legacy_names = {"register"}  # seule ancienne commande à supprimer
         remote_commands = await self.tree.fetch_commands(guild=guild)
         for command in remote_commands:
             if command.name.casefold() in legacy_names:
@@ -77,7 +77,7 @@ class ValorantBot(commands.Bot):
                     await self.http.delete_global_command(self.application_id, command.id)
                 else:
                     await self.http.delete_guild_command(self.application_id, guild.id, command.id)
-                logger.info("Ancienne commande Discord supprimée : /%s", command.name)
+                logger.info("Ancienne commande Discord supprimée : /%s (scope=%s)", command.name, "global" if guild is None else guild.id)
 
     async def on_ready(self) -> None:
         logger.info("Connecté en tant que %s (%s)", self.user, self.user.id if self.user else "?")

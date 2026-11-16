@@ -25,7 +25,7 @@ class CommandSyncCog(commands.Cog):
         if guild_id:
             guild = discord.Object(id=int(guild_id))
             # Purger d'abord les anciennes commandes publiées (globales et serveur).
-            legacy = {"register", "player_create", "stats_player", "top"}
+            legacy = {"register"}
             for command in await self.bot.tree.fetch_commands(guild=guild):
                 if command.name.casefold() in legacy:
                     await self.bot.http.delete_guild_command(
@@ -44,7 +44,7 @@ class CommandSyncCog(commands.Cog):
 
             # Supprimer les anciennes commandes de guilde encore publiées chez Discord.
             remote_guild_commands = await self.bot.tree.fetch_commands(guild=guild)
-            legacy = {"register", "player_create", "stats_player", "top"}
+            legacy = {"register"}
             for command in remote_guild_commands:
                 if command.name.casefold() in legacy:
                     await self.bot.http.delete_guild_command(
