@@ -33,32 +33,10 @@ class ValorantBot(commands.Bot):
                 await self.load_extension(f"cogs.{path.stem}")
                 logger.info("Cog chargé : %s", path.stem)
         if GUILD_ID:
-            guild = discord.Object(id=int(GUILD_ID))
-            # Purger les anciennes commandes distantes avant de publier l'arbre actuel.
-            await self._remove_legacy_remote_commands(guild=guild)
-            await self._remove_legacy_remote_commands(guild=None)
-            # Remplacer entièrement les commandes de guilde : sync() seul
-            # ne supprime pas les anciennes commandes encore enregistrées chez Discord.
-            self.tree.clear_commands(guild=guild)
-            self.tree.copy_global_to(guild=guild)
-            synced_guild = await self.tree.sync(guild=guild)
-
-            # Supprimer explicitement les anciennes commandes distantes de guilde.
-            await self._remove_legacy_remote_commands(guild=guild)
-
-            # Les commandes sont volontairement publiées uniquement sur cette guilde.
-            self.tree.clear_commands(guild=None)
-            await self.tree.sync()
-            # Purger également les anciennes commandes globales (elles peuvent rester
-            # visibles dans Discord si elles avaient été publiées avant le passage en guilde).
-            await self._remove_legacy_remote_commands(guild=None)
+            synced = await self.publish_guild_commands(int(GUILD_ID))
             logger.info(
                 "%s commandes synchronisées pour la guilde %s ; commandes globales supprimées",
-                len(synced_guild),
-                GUILD_ID,
-            )
-            logger.info(
-                "Commandes synchronisées pour la guilde %s ; commandes globales supprimées",
+                len(synced),
                 GUILD_ID,
             )
         elif SYNC_GLOBAL_COMMANDS:
@@ -67,17 +45,18 @@ class ValorantBot(commands.Bot):
         else:
             logger.info("Synchronisation globale différée ; utilisez /sync en tant que propriétaire du bot")
 
-    async def _remove_legacy_remote_commands(self, guild=None) -> None:
-        """Supprime les anciennes commandes publiées chez Discord."""
-        legacy_names = {"register"}  # seule ancienne commande à supprimer
-        remote_commands = await self.tree.fetch_commands(guild=guild)
-        for command in remote_commands:
-            if command.name.casefold() in legacy_names:
-                if guild is None:
-                    await self.http.delete_global_command(self.application_id, command.id)
-                else:
-                    await self.http.delete_guild_command(self.application_id, guild.id, command.id)
-                logger.info("Ancienne commande Discord supprimée : /%s (scope=%s)", command.name, "global" if guild is None else guild.id)
+    async def publish_guild_commands(self, guild_id: int) -> list[app_commands.AppCommand]:
+        """Publie les commandes uniquement sur la guilde et purge les commandes globales.
+
+        L'arbre local n'est jamais vidé : les commandes déclarées par les cogs restent
+        dans ``tree`` pour pouvoir être republiées (par ``/sync``) et répondre aux
+        interactions. Seul l'état distant des commandes globales est effacé.
+        """
+        guild = discord.Object(id=guild_id)
+        self.tree.copy_global_to(guild=guild)
+        synced = await self.tree.sync(guild=guild)  # remplace entièrement les commandes de guilde
+        await self.http.bulk_upsert_global_commands(self.application_id, [])
+        return synced
 
     async def on_ready(self) -> None:
         logger.info("Connecté en tant que %s (%s)", self.user, self.user.id if self.user else "?")
@@ -99,9 +78,15 @@ class RcteCommandTree(app_commands.CommandTree):
             message = "Vous ne possédez pas le rôle requis pour utiliser cette commande."
         elif isinstance(error, app_commands.MissingPermissions):
             message = "Vous n’avez pas les permissions nécessaires pour cette commande."
+        elif isinstance(error, app_commands.CommandOnCooldown):
+            message = f"⏳ Commande en attente, réessaie dans {error.retry_after:.0f} s."
+        elif isinstance(error, app_commands.NoPrivateMessage):
+            message = "Cette commande est utilisable uniquement sur le serveur."
+        elif isinstance(error, app_commands.CheckFailure):
+            message = "Vous ne pouvez pas utiliser cette commande."
         else:
             logger.error("Erreur de commande %s", interaction.command, exc_info=error)
-            message = "Une erreur est survenue. L’équipe technique a été informée."
+            message = "Une erreur est survenue, réessaie dans un instant."
         try:
             if interaction.response.is_done():
                 await interaction.followup.send(message, ephemeral=True)
