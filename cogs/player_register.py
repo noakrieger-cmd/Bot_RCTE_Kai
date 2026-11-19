@@ -5,9 +5,9 @@ from discord import app_commands
 from discord.ext import commands
 
 from utils.storage import edit_data
+from utils.riot_api import RiotAPIError, lookup_account
 
-# Règles Riot ID : nom de 3 à 16 caractères, tag de 2 à 5 caractères alphanumériques.
-# Aucune vérification auprès d'un service tiers : le Riot ID est enregistré tel que saisi.
+# Validation de format avant la vérification du Riot ID via Riot Account API.
 RIOT_NAME_LENGTH = (3, 16)
 RIOT_TAG_PATTERN = re.compile(r"[A-Za-z0-9]{2,5}")
 
@@ -29,17 +29,27 @@ class PlayerRegisterCog(commands.GroupCog, group_name="player", group_descriptio
             )
             return
 
-        riot_id = f"{clean_name}#{clean_tag}"
+        await interaction.response.defer(ephemeral=True, thinking=True)
+        try:
+            account = await lookup_account(clean_name, clean_tag)
+        except RiotAPIError as error:
+            await interaction.followup.send(f"❌ Vérification Riot impossible : {error}", ephemeral=True)
+            return
+
+        riot_id = f"{account.game_name}#{account.tag_line}"
         async with edit_data() as data:
             data.setdefault("accounts", {})[str(interaction.user.id)] = {
                 "discord_name": interaction.user.display_name,
                 "riot_id": riot_id,
+                "puuid": account.puuid,
+                "riot_account_checked": True,
             }
 
-        embed = discord.Embed(title="✅ Riot ID enregistré !", color=discord.Color.green())
+        embed = discord.Embed(title="✅ Riot ID vérifié et enregistré !", color=discord.Color.green())
         embed.add_field(name="👤 Membre", value=interaction.user.display_name, inline=True)
         embed.add_field(name="🆔 Riot ID", value=riot_id, inline=True)
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        embed.set_footer(text="Vérification d’existence du compte uniquement — propriété non confirmée par RSO.")
+        await interaction.followup.send(embed=embed, ephemeral=True)
 
 
 async def setup(bot: commands.Bot) -> None:

@@ -1,11 +1,11 @@
 # Bot RCTE
 
-Bot Discord centré sur l’**organisation des matchs Première** (planning, rappels, présences, composition, résultats, debriefs) et la **recherche de coéquipiers** (`/5s`, `/trio`, `/duo`). Il n’appelle aucune API externe : seules les données saisies sur le serveur sont utilisées.
+Bot Discord centré sur l’**organisation des matchs Première** (planning, rappels, présences, composition, résultats, debriefs), la **recherche de coéquipiers** (`/5s`, `/trio`, `/duo`) et la validation des Riot ID via Riot Account API.
 
 ## Installation
 
 1. Installez Python 3.11 ou plus récent et [uv](https://docs.astral.sh/uv/).
-2. Copiez `.env.example` vers `.env`, puis renseignez `DISCORD_TOKEN` et, pour synchroniser les commandes rapidement pendant le développement, `DISCORD_GUILD_ID`.
+2. Copiez `.env.example` vers `.env`, puis renseignez `DISCORD_TOKEN`, `RIOT_API_KEY` et, pour synchroniser les commandes rapidement pendant le développement, `DISCORD_GUILD_ID`.
 3. Installez les dépendances avec `uv sync` puis lancez le bot avec `uv run python main.py`.
 4. Créez les rôles Discord `Admin RCTE`, `Joueur RCTE` et `Coach-RCTE`. `Joueur RCTE` peut utiliser `/presence` pour indiquer ou modifier son statut (le premier appel crée le sondage) et voter via les boutons ; `Admin RCTE` gère la composition, le planning, les résultats et les pronostics ; `Coach-RCTE` rédige les debriefs.
 5. Activez les intents privilégiés **Server Members Intent** et **Presence Intent** dans le Developer Portal. Le Presence Intent sert aux annonces de stream et à l’attribution du rôle `En Stream`.
@@ -15,4 +15,4 @@ La commande `/planning_add` ajoute un match (date et carte, sans adversaire) et 
 
 Les données runtime sont écrites dans `data.json` à côté de `main.py`. Le fichier est ignoré par Git; `data.example.json` documente sa structure sans inclure de données de test.
 
-La commande `` associe un Riot ID à un compte Discord sans aucune vérification auprès d’un service externe (le format est simplement contrôlé). Les résultats et classements de l’équipe sont saisis manuellement. Les statistiques individuelles ACS/HS% ne sont pas proposées tant qu’aucune source fiable n’est intégrée. La liste des agents est statique : quand Riot ajoute un agent, ajoutez-le dans `utils/valorant.py`.
+La commande `/player create` vérifie le Riot ID auprès de Riot Account API avant de l’enregistrer et conserve le PUUID. Cette vérification confirme l’existence du compte, pas sa propriété : l’opt-in RSO est nécessaire pour une vérification de propriété et pour les statistiques individuelles VALORANT. La commande `/stats_joueur` affiche le compte lié et indique clairement que les statistiques ne sont pas activées tant que l’accès Riot Production/RSO n’est pas disponible. Les résultats et classements de l’équipe restent saisis manuellement.
