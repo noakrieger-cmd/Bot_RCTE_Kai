@@ -3,10 +3,16 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from dataclasses import dataclass
 from urllib.parse import quote
 
 import aiohttp
+from dotenv import load_dotenv
+
+# Charge explicitement le .env situé à la racine du projet
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 EUROPE_BASE_URL = "https://europe.api.riotgames.com"
 
